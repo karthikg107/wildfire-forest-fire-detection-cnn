@@ -205,6 +205,6 @@ forest_fire_cnn.h5
 
 ## Author
 
-**Karthik Guttula**
+**Satya Sai Karthik Guttula**
 
 Forest Fire Detection using Deep Learning and Convolutional Neural Networks.
