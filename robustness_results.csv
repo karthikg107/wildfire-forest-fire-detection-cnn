@@ -1,0 +1,8 @@
+Perturbation,Severity,Accuracy
+None (baseline),-,0.8902438879013062
+Gaussian Noise,0.05,0.8658536585365854
+Gaussian Noise,0.1,0.7121951219512195
+Gaussian Blur,5,0.7853658536585366
+Gaussian Blur,9,0.7390243902439024
+Brightness Reduction,0.7,0.8975609756097561
+Brightness Reduction,0.4,0.8853658536585366
