@@ -1,61 +1,176 @@
-# CNN Based Forest Fire Detection
+# 🌲🔥 Forest Fire Detection using CNN
 
-## Project Overview
+A comparative study of three CNN architectures for binary forest fire image
+classification, with explainability (Grad-CAM + SHAP) and robustness analysis.
 
-This project presents a Convolutional Neural Network (CNN) based approach for detecting forest fires from images. The objective is to classify images into two categories:
+**Course:** Pattern Recognition — M.Sc. Software Engineering  
+**University:** University of Europe for Applied Sciences, Potsdam  
+**Student:** Satya Sai Karthik Guttula  
+**Supervisor:** Raja Hashim Ali  
+**Year:** 2026
 
-* Fire
-* No Fire
+---
 
-The project also compares the performance of a custom CNN model with a transfer learning model (MobileNetV2).
+## 🔗 Live Demo
 
-## Dataset
+👉 **[Try the app on HuggingFace](https://huggingface.co/spaces/karthikg10/forest-fire-detection)**
 
-Wildfire Dataset:
+Upload any forest image and get:
+- Fire 🔥 or No Fire ✅ prediction with confidence score
+- Grad-CAM heatmap showing what the model focused on
 
-https://www.kaggle.com/datasets/elmadafri/the-wildfire-dataset
+---
 
-## Technologies Used
+## 📊 Results Summary
 
-* Python
-* TensorFlow
-* Keras
-* NumPy
-* Matplotlib
-* Scikit-learn
+| Model | Accuracy | AUC | Parameters | Size |
+|---|---|---|---|---|
+| Custom CNN | 80.73% | 0.898 | 11.2M | 127.87 MB |
+| **MobileNetV2** | **89.02%** | **0.957** | **2.4M** | **11.05 MB** |
+| ResNet50 | 62.93% | 0.725 | 23.9M | 93.61 MB |
 
-## Methodology
+**Winner: MobileNetV2** — best accuracy with smallest model size.
 
-1. Dataset Loading
-2. Data Preprocessing
-3. Data Augmentation
-4. CNN Model Development
-5. Model Training
-6. Model Evaluation
-7. Transfer Learning using MobileNetV2
-8. Model Comparison
+> **Note:** ResNet50 underperformed due to a preprocessing mismatch.
+> Generic 1/255 rescaling was used instead of
+> `tf.keras.applications.resnet50.preprocess_input()`.
+> This is a key transfer learning lesson — always use the correct
+> preprocessing for each pretrained model.
 
-## Results
+---
 
-### Custom CNN
+## 🗂️ Dataset
 
-* Accuracy: 80.73%
+**The Wildfire Dataset** by Elmadafri et al. (Kaggle, 2023)
 
-### MobileNetV2
+- 2,699 RGB images — Fire / No Fire
+- Split: Train 1,887 / Val 402 / Test 410
+- 📥 [Download from Kaggle](https://www.kaggle.com/datasets/elmadafri/the-wildfire-dataset)
 
-* Accuracy: 89.02%
+---
 
-## Files
+## 🧠 Models
 
-* cnn-based-forest-fire-detection.ipynb
-* dataset_samples.pdf
-* accuracy_loss_curve.pdf
-* confusion_matrix.pdf
+### 1. Custom CNN (from scratch)
+- 3 Conv blocks: 32 → 64 → 128 filters
+- BatchNorm + MaxPool + Dropout
+- Dense 128 → Sigmoid output
+- Trained for 10 epochs
 
-## Author
+### 2. MobileNetV2 (Transfer Learning)
+- ImageNet pretrained backbone (frozen)
+- Depthwise separable convolutions
+- Custom classification head
+- Trained for 5 epochs
 
-Satya Sai Karthik Guttula
+### 3. ResNet50 (Transfer Learning)
+- ImageNet pretrained backbone (frozen)
+- 50-layer residual network
+- Custom classification head
+- Trained for 5 epochs
 
-M.Sc. Software Engineering
+---
 
-University of Europe for Applied Sciences
+## 🔍 Explainability
+
+### Grad-CAM
+Heatmaps showing which image regions the model focused on:
+- **MobileNetV2** → correctly focused on flame and smoke regions ✅
+- **Custom CNN** → broader, less focused activations
+- **ResNet50** → inconsistent maps due to preprocessing mismatch
+
+### SHAP
+Pixel-level contribution scores (positive = supports fire prediction):
+- MobileNetV2 showed strong positive contributions from flame areas
+- Validated that predictions are based on fire-relevant features
+
+---
+
+## 🧪 Robustness Testing (MobileNetV2)
+
+| Perturbation | Severity | Accuracy |
+|---|---|---|
+| None (baseline) | — | 89.02% |
+| Gaussian noise | σ=0.05 | 86.59% |
+| Gaussian noise | σ=0.10 | 71.22% |
+| Gaussian blur | kernel=5 | 78.54% |
+| Gaussian blur | kernel=9 | 73.90% |
+| Brightness reduction | 0.7 | 89.76% |
+| Brightness reduction | 0.4 | 88.54% |
+
+**Key finding:** Model is robust to brightness changes but sensitive to
+high-severity Gaussian noise.
+
+---
+
+## 📁 Repository Structure
+
+```
+wildfire-forest-fire-detection-cnn/
+│
+├── cnn-based-forest-fire-detection.ipynb  ← Main Kaggle notebook
+├── app.py                                  ← HuggingFace Gradio app
+├── requirements.txt                        ← App dependencies
+├── README.md                               ← This file
+│
+├── Figures/
+│   ├── dataset_samples.pdf
+│   ├── accuracy_loss_curve.pdf
+│   ├── cnn_confusion_matrix.pdf
+│   ├── mobilenet_confusion_matrix.pdf
+│   ├── resnet_confusion_matrix.pdf
+│   ├── gradcam_all.pdf          ← Custom CNN Grad-CAM
+│   ├── gradcam_all_1.pdf        ← MobileNetV2 Grad-CAM
+│   ├── gradcam_all_2.pdf        ← ResNet50 Grad-CAM
+│   ├── shap_all.pdf             ← Custom CNN SHAP
+│   ├── shap_all_1.pdf           ← MobileNetV2 SHAP
+│   └── robustness_plot.pdf
+│
+└── Results/
+    ├── model_comparison.csv
+    └── robustness_results.csv
+```
+
+---
+
+## ⚙️ How to Run
+
+### Option 1 — Kaggle Notebook (recommended)
+Open directly on Kaggle — no setup needed:  
+👉 [kaggle.com/code/karthikguttula10/cnn-based-forest-fire-detection](https://www.kaggle.com/code/karthikguttula10/cnn-based-forest-fire-detection)
+
+### Option 2 — Run locally
+```bash
+# Install dependencies
+pip install tensorflow numpy opencv-python matplotlib scikit-learn shap
+
+# Run notebook
+jupyter notebook cnn-based-forest-fire-detection.ipynb
+```
+
+---
+
+## 🛠️ Technologies
+
+- Python 3.x
+- TensorFlow / Keras
+- NumPy, Matplotlib
+- OpenCV
+- Scikit-learn
+- SHAP
+- Gradio (frontend)
+
+---
+
+## 📄 Report
+
+Full academic report written in Elsevier article format (LaTeX/Overleaf):  
+👉 [View/Edit on Overleaf](https://www.overleaf.com/1747325196zfmfppjxmmvk#e87e9a)
+
+---
+
+## 📬 Contact
+
+**Satya Sai Karthik Guttula**  
+M.Sc. Software Engineering  
+University of Europe for Applied Sciences, Potsdam
